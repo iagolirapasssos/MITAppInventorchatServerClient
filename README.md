@@ -84,6 +84,38 @@ The current implementation uses a static symmetric key, which poses security ris
 - Implement certificate pinning to prevent man-in-the-middle attacks.
 - Regularly rotate the symmetric key and implement a secure mechanism to distribute the new key.
 
+## Was the server designed for multiple connections?
+
+Yes, the Java chat server described in the previous messages is designed to handle multiple client connections concurrently. It achieves this by spawning a new thread for each client that connects. This way, the server can manage multiple connections in parallel, allowing multiple clients to communicate with each other simultaneously.
+
+Here's a brief overview of how it works:
+
+1. **Server Accepts Connections:**
+   The server listens on a specified port using a `ServerSocket`. When a new client tries to connect, the `ServerSocket` accepts the connection, creating a new `Socket` for the client.
+
+2. **Multithreading for Concurrent Handling:**
+   For each new `Socket`, the server starts a new `Thread` running an instance of a `ClientHandler`. This handler takes care of the incoming and outgoing messages for that particular client.
+
+3. **Broadcasting Messages:**
+   When a client sends a message to the server, the server's `ClientHandler` decrypts the message, and then the server encrypts the message again and broadcasts it to all other connected clients through their respective `ClientHandler` instances.
+
+4. **Managing Multiple Clients:**
+   Since each client is handled by its own thread, the server can manage multiple clients at the same time. It maintains a list of clients, adding clients to the list when they connect and removing them when they disconnect.
+
+Here's a simple schematic of the server's multithreaded operations:
+
+```
+[Client1] ---\
+              \
+[Client2] -----> [Server] ---> [ClientHandler1, ClientHandler2, ...]
+              /
+[ClientN] ---/
+```
+
+Each `ClientHandler` can receive messages from its client, decrypt the messages, and then pass them to the server to be sent out (after re-encryption) to all other clients.
+
+In the context of the chat application, this means that any message sent by one member can be received by all other members in the chat, making it a multi-member chat system. However, ensure that the server is robustly designed to handle the potential complexities and load of multiple client connections, which might include synchronization issues, handling disconnects gracefully, and ensuring thread-safe operations on shared resources (like the list of client handlers).
+
 ## Future Steps
 
 - Replace the static symmetric key with a securely exchanged key using a protocol such as Diffie-Hellman.
