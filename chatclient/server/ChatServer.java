@@ -40,11 +40,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
-
-private String clientId;
-private String clientIp;
-private String clientTimestamp;
-
+	
 public class ChatServer {
     private static final int PORT = 12345;
     private static final List<ClientHandler> clients = new CopyOnWriteArrayList<>();
@@ -77,11 +73,17 @@ public class ChatServer {
     }
 
     private static class ClientHandler implements Runnable {
-        private Socket socket;
+    	private Socket socket;
         private BufferedReader in;
         private PrintWriter out;
         private Cipher cipher;
         private SecretKeySpec keySpec;
+        
+        // Move the variables inside the ClientHandler class
+        private String clientId;
+        private String clientIp;
+        private String clientTimestamp;
+
 
         public ClientHandler(Socket socket) throws Exception {
             this.socket = socket;
