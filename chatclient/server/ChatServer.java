@@ -30,6 +30,7 @@ DEALINGS IN THE SOFTWARE.
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
+
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Base64;
@@ -39,6 +40,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
+
+private String clientId;
+private String clientIp;
+private String clientTimestamp;
 
 public class ChatServer {
     private static final int PORT = 12345;
@@ -96,14 +101,26 @@ public class ChatServer {
                     // Descriptografa a mensagem
                     cipher.init(Cipher.DECRYPT_MODE, keySpec);
                     byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(encryptedMessage));
-                    String message = new String(decryptedBytes);
+                    String messageWithDetails = new String(decryptedBytes);
                     
-                    System.out.println("Mensagem recebida: " + message);
+                    // Extract the details
+                    String[] parts = messageWithDetails.split(",", 4);
+                    if (parts.length == 4) {
+                        clientTimestamp = parts[0];
+                        clientIp = parts[1];
+                        clientId = parts[2];
+                        String message = parts[3];
+                        
+                        System.out.println("Mensagem recebida: " + message);
 
-                    // Recriptografa e envia para todos os outros clientes
-                    cipher.init(Cipher.ENCRYPT_MODE, keySpec);
-                    String reEncryptedMessage = Base64.getEncoder().encodeToString(cipher.doFinal(message.getBytes()));
-                    ChatServer.broadcast(reEncryptedMessage, this);
+                        // Prepare the response including the client's unique ID
+                        String response = clientId + "," + message;
+                        
+                        // Recriptografa a resposta
+                        cipher.init(Cipher.ENCRYPT_MODE, keySpec);
+                        String reEncryptedMessage = Base64.getEncoder().encodeToString(cipher.doFinal(response.getBytes()));
+                        out.println(reEncryptedMessage);
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
