@@ -91,6 +91,7 @@ public class ChatServer {
         private SecretKeySpec keySpec;
         
         // Variables to store client details
+        private String clientMethod;
         private String clientId;
         private String clientIp;
         private String clientTimestamp;
