@@ -112,10 +112,10 @@ public class ChatServer {
                         clientTimestamp = parts[0];
                         clientIp = parts[1];
                         clientId = parts[2];
-                        message = parts[3];
+                        message = parts[3] + ", " + clientIp + ", " + clientId;
                     }
                     
-                    System.out.println("Message received: " + message);
+                    System.out.println("Message received: " + message + ", IP: " + clientIp + " and ID: " + clientId);
                     
                     // Encrypt and send the response
                     cipher.init(Cipher.ENCRYPT_MODE, keySpec);
