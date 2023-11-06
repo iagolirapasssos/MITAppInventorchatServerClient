@@ -42,24 +42,33 @@ import java.io.BufferedReader;
 import java.io.PrintWriter;
 	
 public class ChatServer {
+	// Define the server port and the encryption details
     private static final int PORT = 12345;
-    private static final List<ClientHandler> clients = new CopyOnWriteArrayList<>();
     private static final String KEY = "MySuperSecretKey"; // 16-byte key
     private static final String ALGORITHM = "AES";
+    
+    // Create a thread-safe list to hold all client handlers
+    private static final List<ClientHandler> clients = new CopyOnWriteArrayList<>();
 
     public static void main(String[] args) throws Exception {
         ServerSocket serverSocket = new ServerSocket(PORT);
-        System.out.println("Servidor escutando na porta " + PORT);
+        System.out.println("Server listening on port " + PORT);
         
         while (true) {
+        	// Accept new client connections
             Socket clientSocket = serverSocket.accept();
-            System.out.println("Conexão estabelecida com " + clientSocket.getRemoteSocketAddress());
+            System.out.println("Connection established with " + clientSocket.getRemoteSocketAddress());
+            
+            // Create a new client handler for the connection
             ClientHandler clientHandler = new ClientHandler(clientSocket);
             clients.add(clientHandler);
+            
+            // Start a new thread to handle the client
             new Thread(clientHandler).start();
         }
     }
-
+    
+    // Broadcast a message to all clients except the sender
     public static void broadcast(String message, ClientHandler sender) {
         for (ClientHandler client : clients) {
             if (client != sender) {
@@ -67,11 +76,13 @@ public class ChatServer {
             }
         }
     }
-
+    
+    // Remove a client from the list
     public static void removeClient(ClientHandler client) {
         clients.remove(client);
     }
 
+    // Inner class to handle client connections
     private static class ClientHandler implements Runnable {
     	private Socket socket;
         private BufferedReader in;
@@ -79,7 +90,7 @@ public class ChatServer {
         private Cipher cipher;
         private SecretKeySpec keySpec;
         
-        // Move the variables inside the ClientHandler class
+        // Variables to store client details
         private String clientId;
         private String clientIp;
         private String clientTimestamp;
@@ -87,8 +98,12 @@ public class ChatServer {
 
         public ClientHandler(Socket socket) throws Exception {
             this.socket = socket;
+            
+            // Set up streams for communication
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
+            
+            // Set up encryption components
             keySpec = new SecretKeySpec(KEY.getBytes(), ALGORITHM);
             cipher = Cipher.getInstance(ALGORITHM);
         }
@@ -97,6 +112,7 @@ public class ChatServer {
         public void run() {
             try {
                 while (true) {
+                	// Read the encrypted message from the client
                     String encryptedMessage = in.readLine();
                     if (encryptedMessage == null) break;
 
@@ -109,12 +125,14 @@ public class ChatServer {
                     String[] parts = message.split(",", 4);
                     if (parts.length == 4) {
                         // Message contains details
+                    	// Assign the details to variables
                         clientTimestamp = parts[0];
                         clientIp = parts[1];
                         clientId = parts[2];
                         message = parts[3] + ", " + clientIp + ", " + clientId;
                     }
                     
+                    // Log the received message and details
                     System.out.println("Message received: " + message + ", IP: " + clientIp + " and ID: " + clientId);
                     
                     // Encrypt and send the response
@@ -133,7 +151,8 @@ public class ChatServer {
                 ChatServer.removeClient(this);
             }
         }
-
+        
+        // Helper method to send a message to the client
         public void sendMessage(String message) {
             out.println(message);
         }
