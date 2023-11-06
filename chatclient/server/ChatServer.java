@@ -100,29 +100,27 @@ public class ChatServer {
                     String encryptedMessage = in.readLine();
                     if (encryptedMessage == null) break;
 
-                    // Descriptografa a mensagem
+                    // Decrypt the message
                     cipher.init(Cipher.DECRYPT_MODE, keySpec);
                     byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(encryptedMessage));
-                    String messageWithDetails = new String(decryptedBytes);
+                    String message = new String(decryptedBytes);
                     
-                    // Extract the details
-                    String[] parts = messageWithDetails.split(",", 4);
+                    // Check for the message details
+                    String[] parts = message.split(",", 4);
                     if (parts.length == 4) {
+                        // Message contains details
                         clientTimestamp = parts[0];
                         clientIp = parts[1];
                         clientId = parts[2];
-                        String message = parts[3];
-                        
-                        System.out.println("Mensagem recebida: " + message);
-
-                        // Prepare the response including the client's unique ID
-                        String response = clientId + "," + message;
-                        
-                        // Recriptografa a resposta
-                        cipher.init(Cipher.ENCRYPT_MODE, keySpec);
-                        String reEncryptedMessage = Base64.getEncoder().encodeToString(cipher.doFinal(response.getBytes()));
-                        out.println(reEncryptedMessage);
+                        message = parts[3];
                     }
+                    
+                    System.out.println("Message received: " + message);
+                    
+                    // Encrypt and send the response
+                    cipher.init(Cipher.ENCRYPT_MODE, keySpec);
+                    String encryptedResponse = Base64.getEncoder().encodeToString(cipher.doFinal(message.getBytes()));
+                    out.println(encryptedResponse);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
