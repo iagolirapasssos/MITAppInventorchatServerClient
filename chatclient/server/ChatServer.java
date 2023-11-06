@@ -123,17 +123,28 @@ public class ChatServer {
                     
                     // Check for the message details
                     String[] parts = message.split(",", 4);
-                    if (parts.length == 4) {
-                        // Message contains details
-                    	// Assign the details to variables
-                        clientTimestamp = parts[0];
-                        clientIp = parts[1];
-                        clientId = parts[2];
-                        message = parts[3] + ", " + clientIp + ", " + clientId + ", " + clientTimestamp;
+                    
+                    // Assign the details to variables
+                    clientMethod = parts[0];
+                    clientTimestamp = parts[1];
+                    clientIp = parts[2];
+                    clientId = parts[3];
+                    clientMessage = parts[4];
+                    
+                    if (clientMethod == "SendMessageWithDetails") {
+                        message = clientMessage + ", " + clientIp + ", " + clientId + ", " + clientTimestamp;
+                    } else {
+                    	message = clientMessage
                     }
                     
                     // Log the received message and details
-                    System.out.println("Message received: " + message + ", IP: " + parts[1] + ", ID: " + parts[2] + " and Timestamp: " + parts[0]);
+                    System.out.println(
+                    		"clientMethod: " + clientMethod
+                    		+ ", Message received: " + clientMessage 
+                    		+ ", IP: " + clientIp + ", ID: " 
+                    		+ clientId + "Timestamp: " 
+                    		+ clientTimestamp
+                    		);
                     
                     // Encrypt and send the response
                     cipher.init(Cipher.ENCRYPT_MODE, keySpec);
