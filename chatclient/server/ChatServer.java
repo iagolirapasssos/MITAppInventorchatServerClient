@@ -92,6 +92,7 @@ public class ChatServer {
         
         // Variables to store client details
         private String clientMethod;
+        private String clientMessage;
         private String clientId;
         private String clientIp;
         private String clientTimestamp;
