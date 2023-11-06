@@ -134,7 +134,7 @@ public class ChatServer {
                     if (clientMethod == "SendMessageWithDetails") {
                         message = clientMessage + ", " + clientIp + ", " + clientId + ", " + clientTimestamp;
                     } else {
-                    	message = clientMessage
+                    	message = clientMessage;
                     }
                     
                     // Log the received message and details
