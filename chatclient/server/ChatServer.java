@@ -129,7 +129,7 @@ public class ChatServer {
                         clientTimestamp = parts[0];
                         clientIp = parts[1];
                         clientId = parts[2];
-                        message = parts[3] + ", " + clientIp + ", " + clientId, ", " + clientTimestamp;
+                        message = parts[3] + ", " + clientIp + ", " + clientId + ", " + clientTimestamp;
                     }
                     
                     // Log the received message and details
