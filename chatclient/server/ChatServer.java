@@ -124,7 +124,7 @@ public class ChatServer {
                     String message = new String(decryptedBytes);
                     
                     // Check for the message details
-                    String[] parts = message.split(",", 4);
+                    String[] parts = message.split(",", 5);
                     
                     // Assign the details to variables
                     clientMethod = parts[0];
