@@ -144,7 +144,7 @@ public class ChatServer {
                     		"clientMethod: " + clientMethod
                     		+ ", Message received: " + clientMessage 
                     		+ ", IP: " + clientIp + ", ID: " 
-                    		+ clientId + "Timestamp: " 
+                    		+ clientId + ", Timestamp: " 
                     		+ clientTimestamp
                     		);
                     
